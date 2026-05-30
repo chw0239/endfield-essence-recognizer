@@ -1,4 +1,7 @@
 from endfield_essence_recognizer.core.recognition import RarityLabel
+from endfield_essence_recognizer.core.scanner.custom_evaluate import (
+    GlobalCustomRuleObject,
+)
 from endfield_essence_recognizer.core.scanner.models import (
     EssenceData,
     EssenceQuality,
@@ -11,7 +14,7 @@ from endfield_essence_recognizer.schemas.user_setting import (
 )
 
 
-def evaluate_essence(
+def _evaluate_essence(
     data: EssenceData,
     setting: UserSetting,
     static_game_data: StaticGameData,
@@ -164,3 +167,15 @@ def evaluate_essence(
                 matched_weapons_all_blocked=True,
                 is_high_level=False,
             )
+
+
+def evaluate_essence(
+    data: EssenceData,
+    setting: UserSetting,
+    static_game_data: StaticGameData,
+) -> EvaluationResult:
+    original_result = _evaluate_essence(data, setting, static_game_data)
+    final_result = GlobalCustomRuleObject.apply(
+        data, setting, static_game_data, original_result
+    )
+    return final_result

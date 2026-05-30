@@ -20,6 +20,9 @@ from endfield_essence_recognizer.core.scanner.action_logic import (
 from endfield_essence_recognizer.core.scanner.context import (
     ScannerContext,
 )
+from endfield_essence_recognizer.core.scanner.custom_evaluate import (
+    GlobalCustomRuleObject,
+)
 from endfield_essence_recognizer.core.scanner.evaluate import evaluate_essence
 from endfield_essence_recognizer.core.scanner.models import (
     EssenceData,
@@ -169,6 +172,8 @@ def recognize_once(
     ):
         return
 
+    GlobalCustomRuleObject.refresh_code()
+
     evaluation = evaluate_essence(data, user_setting, ctx.static_game_data)
     # all logs use success for simplicity
     logger.opt(colors=True).success(evaluation.log_message)
@@ -296,6 +301,8 @@ class ScannerEngine:
         check_scene_result = check_scene(self._image_source, self.ctx, self._profile)
         if not check_scene_result:
             return
+
+        GlobalCustomRuleObject.refresh_code()
 
         # 获取当前用户设置的快照，用于接下来的判断
         user_setting = self._user_setting_manager.get_user_setting()
@@ -469,6 +476,8 @@ class DraggableScannerEngine(ScannerEngine):
             # 调用父类的单页扫描逻辑
             super()._execute_grid_scan(stop_event)
             return
+
+        GlobalCustomRuleObject.refresh_code()
 
         icon_x_list = self._profile.essence_icon_x_list
         icon_y_list = self._profile.essence_icon_y_list
@@ -759,6 +768,8 @@ class DraggableScannerEngine(ScannerEngine):
             max_drag=max_drag,
             on_step=on_step,
         )
+
+        logger.info(f"执行拖动{drag_start} => {drag_end}, 每次拖动{step}, 最大拖动{max_drag}, 实际拖动{actual_distance}")
 
         # 如果提前停止，说明检测到滚动条到底
         is_last_page = stopped_early

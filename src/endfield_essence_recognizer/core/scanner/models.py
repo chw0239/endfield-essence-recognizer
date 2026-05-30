@@ -25,6 +25,13 @@ class EssenceQuality(StrEnum):
     """Item should be ignored by automatic actions."""
 
 
+class ActionTarget(StrEnum):
+    DEFAULT = "default"
+    LOCK = "lock"
+    ABANDON = "abandon"
+    NONE = "none"
+
+
 @dataclass
 class EssenceData:
     """Raw recognition data for a single essence."""
@@ -63,3 +70,6 @@ class EvaluationResult:
 
     is_high_level: bool = False
     """Whether any attribute on the essence exceeded a high-level threshold."""
+
+    action_target: ActionTarget = ActionTarget.DEFAULT
+    """Target lock/abandon status"""

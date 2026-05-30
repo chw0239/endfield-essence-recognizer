@@ -9,6 +9,7 @@ from endfield_essence_recognizer.core.scanner.models import (
     EssenceData,
     EssenceQuality,
     EvaluationResult,
+    ActionTarget,
 )
 from endfield_essence_recognizer.schemas.user_setting import Action, UserSetting
 
@@ -64,6 +65,15 @@ def decide_actions(
         target_action = setting.treasure_action
     else:  # TRASH
         target_action = setting.trash_action
+
+    # override action
+    if evaluation.action_target != ActionTarget.DEFAULT:
+        if evaluation.action_target == ActionTarget.NONE:
+            target_action = Action.UNLOCK_AND_UNDEPRECATE
+        elif evaluation.action_target == ActionTarget.LOCK:
+            target_action = Action.LOCK
+        elif evaluation.action_target == ActionTarget.ABANDON:
+            target_action = Action.DEPRECATE
 
     if target_action == Action.LOCK:
         should_lock = True
